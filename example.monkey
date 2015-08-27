@@ -4,7 +4,7 @@ Import mojo
 
 Import realtime
 
-Const APP_KEY:String = "QI94Ii"
+Const APP_KEY:String = "YOUR APP KEY"
 Const AUTH_TOKEN:String = "Not necessary for unsecured connections!"
 
 Class MyApp Extends App Implements IRealtimeCallback
@@ -206,6 +206,7 @@ Class MyApp Extends App Implements IRealtimeCallback
     _message = "Disconnected!"
     addMessage( _message )
     _isConnected = False;
+    _subscribed = False;
   End Method
   
   Method OnRealtimeSubscribed:Void( channelName:String )
