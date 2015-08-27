@@ -3,6 +3,7 @@ function XRealtime()
 }
 
 var _ortcClient;
+var _isInitialized = false;
 var _channels = [];
 
 function Event( result, channel, message, error )
@@ -33,6 +34,7 @@ XRealtime.prototype.init = function( appKey, appToken )
   script.type = 'text/javascript';
   script.src = "http://dfdbz2tdq3k01.cloudfront.net/js/2.1.0/ortc.js";
   head.appendChild( script );
+  _isInitialized = false;
 
   script.onload = function()
   {
@@ -97,21 +99,33 @@ XRealtime.prototype.init = function( appKey, appToken )
           };
         }
         _ortcClient.connect( appKey, appToken );
+        _isInitialized = true;
       }
     });
   }
 }
-/*
+
+XRealtime.prototype.isInitialized = function()
+{
+  return _isInitialized;
+}
+
 XRealtime.prototype.connect = function( appKey, appToken )
 {
   if( _ortcClient )
-    _ortcClient.connect( appKey, appToken );
+  {
+    if( !_ortcClient.getIsConnected() )
+      _ortcClient.connect( appKey, appToken );
+  }
 }
-*/
+
 XRealtime.prototype.disconnect = function()
 {
   if( _ortcClient )
-    _ortcClient.disconnect();
+  {
+    if( _ortcClient.getIsConnected() )
+      _ortcClient.disconnect();
+  }
 }
 
 XRealtime.prototype.getAnnouncementSubChannel = function()

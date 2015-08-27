@@ -18,17 +18,24 @@
 
 Strict
 
-#If( TARGET <> "html5" )
+#If( TARGET <> "html5" And TARGET <> "android" )
   #Error "Realtime is currently not available for target '${TARGET}'."
 #End If
 
 Import "native/realtime.${TARGET}.${LANG}"
+#If( TARGET = "android" )
+  #LIBS += "${CD}/native/json_simple-1.1.jar"
+  #LIBS += "${CD}/native/messaging-android-2.1.52.jar"
+#End If
+
 Import brl.asyncevent
 
 Extern Private
 
 Class XRealtime
   Method init:Void( appKey:String, authToken:String )
+  Method isInitialized:Bool()
+  Method connect:Void( appKey:String, authToken:String )
   Method disconnect:Void()
   Method getAnnouncementSubChannel:String()
   Method getClusterUrl:String()
@@ -87,6 +94,10 @@ Interface IRealtimeCallback
   Method OnRealtimeReconnecting:Void()
   Method OnRealtimeReconnected:Void()
   Method OnRealtimeNewMessage:Void( channelName:String, message:String )
+  Method OnRealtimeClientConnected:Void( metadata:String )
+  Method OnRealtimeClientDisconnected:Void( metadata:String, typeOfDisconnect:Int )
+  Method OnRealtimeClientSubscribed:Void( metadata:String, channelName:String )
+  Method OnRealtimeClientUnsubscribed:Void( metadata:String, channelName:String )
 End Interface
 
 Class Realtime Implements IAsyncEventSource
@@ -110,10 +121,17 @@ Public
     _realTime.init( appKey, authToken )
     AddAsyncEventSource( Self )
   End Method
+  
+  Method isInitialized:Bool()
+    Return _realTime.isInitialized()
+  End Method
+
+  Method connect:Void( appKey:String, authToken:String = "DUMMY" )
+    _realTime.connect( appKey, authToken )
+  End Method
 
   Method disconnect:Void()
     _realTime.disconnect()
-    RemoveAsyncEventSource( Self )
   End Method
 
   Method getAnnouncementSubChannel:String()
@@ -258,7 +276,60 @@ Private
         Local channelName:String = _realTime.getLastChannelName()
         Local message:String = _realTime.getLastMessage()
         _realTime.fetchLastEvent()  'Remove event from list of events
-        _callback.OnRealtimeNewMessage( channelName, message )
+        'Check if we have a message from an announcement channel
+        Select( channelName )
+          Case "ortcClientConnected"
+            Local pos:Int = message.Find( ":" )
+            If( pos > 0 )
+              'get the metadata
+              Local metadata:String = message[..message.Length()-2]
+              metadata = metadata[pos+2..]
+              _callback.OnRealtimeClientConnected( metadata )
+            End If
+          Case "ortcClientDisconnected"
+            Local pos:Int = message.Find( ":" )
+            If( pos > 0 )
+              'get the metadata
+              Local metadata:String = message[..message.Length()-8]
+              metadata = metadata[pos+2..]
+              Local reason:String = message[message.Length()-2..]
+              reason = reason[..1]
+              _callback.OnRealtimeClientDisconnected( metadata, Int( reason ) )
+            End If
+          Case "ortcClientSubscribed"
+            Local str:String[] = message.Split( ":" )
+            Print str.Length()
+            If( str.Length() = 3 )
+              'Check for the channelName. If it's "ortcClientSubscribed" we ignore it because it's the announcement channel
+              Local channel:String = str[2]
+              channel = channel[..channel.Length()-2]
+              channel = channel[1..]
+              If( channel <> "ortcClientConnected" And channel <> "ortcClientDisconnected" And channel <> "ortcClientSubscribed" And channel <> "ortcClientUnsubscribed" )
+                Local metadata:String = str[1]
+                metadata = metadata[..metadata.Length()-6]
+                metadata = metadata[1..]
+                _callback.OnRealtimeClientSubscribed( metadata, channel )
+              End If
+            End If
+          Case "ortcClientUnsubscribed"
+            Local str:String[] = message.Split( ":" )
+            Print str.Length()
+            If( str.Length() = 3 )
+              'Check for the channelName. If it's "ortcClientUnsubscribed" we ignore it because it's the announcement channel
+              Local channel:String = str[2]
+              channel = channel[..channel.Length()-2]
+              channel = channel[1..]
+              If( channel <> "ortcClientConnected" And channel <> "ortcClientDisconnected" And channel <> "ortcClientSubscribed" And channel <> "ortcClientUnsubscribed" )
+                Local metadata:String = str[1]
+                metadata = metadata[..metadata.Length()-6]
+                metadata = metadata[1..]
+                _callback.OnRealtimeClientUnsubscribed( metadata, channel )
+              End If
+            End If
+          Default
+            'No announcement channel, just proceed normally
+            _callback.OnRealtimeNewMessage( channelName, message )
+        End Select
     End Select
   End Method
 End Class
