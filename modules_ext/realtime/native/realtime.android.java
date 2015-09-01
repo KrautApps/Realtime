@@ -34,8 +34,6 @@ class XRealtime
 {
   private Activity _activity;
   private OrtcClient _client = null;
-  private int _reconnectingTries = 0;
-  private static final int RESULT_SETTINGS = 1;
   private boolean _isInitialized = false;
 
   private int RT_ERROR = 1;
