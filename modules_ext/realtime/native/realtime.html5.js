@@ -52,7 +52,6 @@ XRealtime.prototype.init = function( appKey, appToken )
           _ortcClient = factory.createClient();
 
           // Set ORTC client properties
-          _ortcClient.setId( 'clientId' );
           _ortcClient.setConnectionMetadata( 'clientConnMeta' );
           _ortcClient.setClusterUrl( 'http://ortc-developers.realtime.co/server/2.1/' );
 
@@ -181,21 +180,7 @@ XRealtime.prototype.getId = function()
 {
   if( _ortcClient )
     return _ortcClient.getId();
-  return "ERROR";
-}
-
-XRealtime.prototype.getProtocol = function()
-{
-  if( _ortcClient )
-    return _ortcClient.getProtocol();
-  return "ERROR";
-}
-
-XRealtime.prototype.getSessionId = function()
-{
-  if( _ortcClient )
-    return _ortcClient.getSessionId();
-  return "ERROR";
+  return -1;
 }
 
 XRealtime.prototype.getUrl = function()
@@ -271,12 +256,6 @@ XRealtime.prototype.setId = function( id )
 {
   if( _ortcClient )
     _ortcClient.setId( id );
-}
-
-XRealtime.prototype.setProtocol = function( protocol )
-{
-  if( _ortcClient )
-    _ortcClient.setProtocol( protocol );
 }
 
 XRealtime.prototype.setUrl = function( url )

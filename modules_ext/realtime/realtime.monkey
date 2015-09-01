@@ -44,9 +44,7 @@ Class XRealtime
   Method getHeartbeatActive:Bool()
   Method getHeartbeatFails:Int()
   Method getHeartbeatTime:Int()
-  Method getId:String()
-  Method getProtocol:String()
-  Method getSessionId:String()
+  Method getId:Int()
   Method getUrl:String()
   Method getIsConnected:Bool()
   Method isSubscribed:Bool( channelName:String )
@@ -58,8 +56,7 @@ Class XRealtime
   Method setHeartbeatActive:Void( active:Bool )
   Method setHeartbeatFails:Void( newHeartbeatFails:Int )
   Method setHeartbeatTime:Void( newHeartbeatTime:Int )
-  Method setId:Void( id:String )
-  Method setProtocol:Void( protocol:String )
+  Method setId:Void( id:Int )
   Method setUrl:Void( url:String )
   Method subscribe:Void( channelName:String, subscribeOnReconnected:Bool )
   Method unsubscribe:Void( channelName:String )
@@ -162,16 +159,8 @@ Public
     Return _realTime.getHeartbeatTime()
   End Method
   
-  Method getId:String()
+  Method getId:Int()
     Return _realTime.getId()
-  End Method
-  
-  Method getProtocol:String()
-    Return _realTime.getProtocol()
-  End Method
-  
-  Method getSessionId:String()
-    Return _realTime.getSessionId()
   End Method
   
   Method getUrl:String()
@@ -218,12 +207,8 @@ Public
     _realTime.setHeartbeatTime( newHeartbeatTime )
   End Method
   
-  Method setId:Void( id:String )
+  Method setId:Void( id:Int )
     _realTime.setId( id )
-  End Method
-  
-  Method setProtocol:Void( protocol:String )
-    _realTime.setProtocol( protocol )
   End Method
   
   Method setUrl:Void( url:String )
