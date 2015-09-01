@@ -61,8 +61,6 @@ class XRealtime
       Ortc ortc = new Ortc();
       OrtcFactory factory = ortc.loadOrtcFactory( "IbtRealtimeSJ" );
       _client = factory.createClient();
-      _client.setApplicationContext( null );//_activity.getApplicationContext() );
-      //_client.setGoogleProjectId("0123456789");
       _client.setConnectionMetadata( "AndroidApp" );
       _client.setClusterUrl( "http://ortc-developers.realtime.co/server/2.1/" );
     }
