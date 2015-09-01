@@ -2,7 +2,7 @@
 
 This is a Monkey X wrapper for Realtime.co. For reference look at http://www.realtime.co
 
-Currently working targets are: HTML5.
+Currently working targets are: HTML5, Android
 
 # Installation
 
