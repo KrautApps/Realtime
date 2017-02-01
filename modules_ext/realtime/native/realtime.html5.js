@@ -32,7 +32,7 @@ XRealtime.prototype.init = function( appKey, appToken )
   var head = document.getElementsByTagName( 'head' )[0];
   var script = document.createElement( 'script' );
   script.type = 'text/javascript';
-  script.src = "http://dfdbz2tdq3k01.cloudfront.net/js/2.1.0/ortc.js";
+  script.src = "http://messaging-public.realtime.co/js/2.1.0/ortc.js";
   head.appendChild( script );
   _isInitialized = false;
 

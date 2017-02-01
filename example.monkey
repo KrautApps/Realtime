@@ -4,7 +4,7 @@ Import mojo
 
 Import realtime
 
-Const APP_KEY:String = "YOUR APP KEY"
+Const APP_KEY:String = "QI94Ii"
 Const AUTH_TOKEN:String = "Not necessary for unsecured connections!"
 
 Class MyApp Extends App Implements IRealtimeCallback

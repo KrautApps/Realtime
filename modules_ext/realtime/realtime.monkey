@@ -18,57 +18,100 @@
 
 Strict
 
-#If( TARGET <> "html5" And TARGET <> "android" )
+#If( TARGET <> "html5" And TARGET <> "android" And TARGET <> "ios" And TARGET <> "glfw" )
   #Error "Realtime is currently not available for target '${TARGET}'."
 #End If
 
 Import "native/realtime.${TARGET}.${LANG}"
 #If( TARGET = "android" )
-  #LIBS += "${CD}/native/json_simple-1.1.jar"
-  #LIBS += "${CD}/native/messaging-android-2.1.52.jar"
+  #LIBS += "${CD}/native/lib_android/json_simple-1.1.jar"
+  #LIBS += "${CD}/native/lib_android/messaging-android-2.1.70.jar"
+#End If
+#If( TARGET = "ios" )
+  #LIBS += "${CD}/native/lib_ios/include/OrtcClient.h"
+  #LIBS += "${CD}/native/lib_ios/include/RealtimePushAppDelegate.h"
+  #LIBS += "${CD}/native/lib_ios/libOrtcClient.a"
 #End If
 
 Import brl.asyncevent
 
 Extern Private
 
-Class XRealtime
-  Method init:Void( appKey:String, authToken:String )
-  Method isInitialized:Bool()
-  Method connect:Void( appKey:String, authToken:String )
-  Method disconnect:Void()
-  Method getAnnouncementSubChannel:String()
-  Method getClusterUrl:String()
-  Method getConnectionMetadata:String()
-  Method getConnectionTimeout:Int()
-  Method getHeartbeatActive:Bool()
-  Method getHeartbeatFails:Int()
-  Method getHeartbeatTime:Int()
-  Method getId:Int()
-  Method getUrl:String()
-  Method getIsConnected:Bool()
-  Method isSubscribed:Bool( channelName:String )
-  Method send:Void( channelName:String, message:String )
-  Method setAnnouncementSubChannel:Void( channelName:String )
-  Method setClusterUrl:Void( clusterUrl:String )
-  Method setConnectionMetadata:Void( connectionMetadata:String )
-  Method setConnectionTimeout:Void( connectionTimeout:Int )
-  Method setHeartbeatActive:Void( active:Bool )
-  Method setHeartbeatFails:Void( newHeartbeatFails:Int )
-  Method setHeartbeatTime:Void( newHeartbeatTime:Int )
-  Method setId:Void( id:Int )
-  Method setUrl:Void( url:String )
-  Method subscribe:Void( channelName:String, subscribeOnReconnected:Bool )
-  Method unsubscribe:Void( channelName:String )
-  
+#If( TARGET = "glfw" )
+  Function RTinit:Void( appKey:String, authToken:String )
+  Function RTisInitialized:Bool()
+  Function RTconnect:Void( appKey:String, authToken:String )
+  Function RTdisconnect:Void()
+  Function RTgetAnnouncementSubChannel:String()
+  Function RTgetClusterUrl:String()
+  Function RTgetConnectionMetadata:String()
+  Function RTgetConnectionTimeout:Int()
+  Function RTgetHeartbeatActive:Bool()
+  Function RTgetHeartbeatFails:Int()
+  Function RTgetHeartbeatTime:Int()
+  Function RTgetId:Int()
+  Function RTgetUrl:String()
+  Function RTgetIsConnected:Bool()
+  Function RTisSubscribed:Bool( channelName:String )
+  Function RTsend:Void( channelName:String, message:String )
+  Function RTsetAnnouncementSubChannel:Void( channelName:String )
+  Function RTsetClusterUrl:Void( clusterUrl:String )
+  Function RTsetConnectionMetadata:Void( connectionMetadata:String )
+  Function RTsetConnectionTimeout:Void( connectionTimeout:Int )
+  Function RTsetHeartbeatActive:Void( active:Bool )
+  Function RTsetHeartbeatFails:Void( newHeartbeatFails:Int )
+  Function RTsetHeartbeatTime:Void( newHeartbeatTime:Int )
+  Function RTsetId:Void( id:Int )
+  Function RTsetUrl:Void( url:String )
+  Function RTsubscribe:Void( channelName:String, subscribeOnReconnected:Bool )
+  Function RTunsubscribe:Void( channelName:String )
+      
   'Internal functions
-  Method getNumberOfEvents:Int()
-  Method fetchLastEvent:Void()
-  Method getLastResult:Int()          'Returns the last overall result in terms of if there were errors or not
-  Method getLastError:Int()           'Returns the last error code
-  Method getLastChannelName:String()  'Returns the last channel name an event happened for
-  Method getLastMessage:String()
-End
+  Function RTgetNumberOfEvents:Int()
+  Function RTfetchLastEvent:Void()
+  Function RTgetLastResult:Int()          'Returns the last overall result in terms of if there were errors or not
+  Function RTgetLastError:Int()           'Returns the last error code
+  Function RTgetLastChannelName:String()  'Returns the last channel name an event happened for
+  Function RTgetLastMessage:String()
+#Else
+  Class XRealtime
+    Method init:Void( appKey:String, authToken:String )
+    Method isInitialized:Bool()
+    Method connect:Void( appKey:String, authToken:String )
+    Method disconnect:Void()
+    Method getAnnouncementSubChannel:String()
+    Method getClusterUrl:String()
+    Method getConnectionMetadata:String()
+    Method getConnectionTimeout:Int()
+    Method getHeartbeatActive:Bool()
+    Method getHeartbeatFails:Int()
+    Method getHeartbeatTime:Int()
+    Method getId:Int()
+    Method getUrl:String()
+    Method getIsConnected:Bool()
+    Method isSubscribed:Bool( channelName:String )
+    Method send:Void( channelName:String, message:String )
+    Method setAnnouncementSubChannel:Void( channelName:String )
+    Method setClusterUrl:Void( clusterUrl:String )
+    Method setConnectionMetadata:Void( connectionMetadata:String )
+    Method setConnectionTimeout:Void( connectionTimeout:Int )
+    Method setHeartbeatActive:Void( active:Bool )
+    Method setHeartbeatFails:Void( newHeartbeatFails:Int )
+    Method setHeartbeatTime:Void( newHeartbeatTime:Int )
+    Method setId:Void( id:Int )
+    Method setUrl:Void( url:String )
+    Method subscribe:Void( channelName:String, subscribeOnReconnected:Bool )
+    Method unsubscribe:Void( channelName:String )
+    
+    'Internal functions
+    Method getNumberOfEvents:Int()
+    Method fetchLastEvent:Void()
+    Method getLastResult:Int()          'Returns the last overall result in terms of if there were errors or not
+    Method getLastError:Int()           'Returns the last error code
+    Method getLastChannelName:String()  'Returns the last channel name an event happened for
+    Method getLastMessage:String()
+  End Class
+#End If
 
 Public
 
@@ -97,224 +140,446 @@ Interface IRealtimeCallback
   Method OnRealtimeClientUnsubscribed:Void( metadata:String, channelName:String )
 End Interface
 
-Class Realtime Implements IAsyncEventSource
-Protected
-  Field _realTime:XRealtime = Null
-  Field _callback:IRealtimeCallback
-
-Private
-  'Prohibit usage of default constructor
-  Method New()
-  End Method
-
-Public
-  Method New( callback:IRealtimeCallback )
-    _realTime = New XRealtime()
-'    _realTime.init()
-    _callback = callback
-  End Method
-
-  Method init:Void( appKey:String, authToken:String = "DUMMY" )
-    _realTime.init( appKey, authToken )
-    AddAsyncEventSource( Self )
-  End Method
-  
-  Method isInitialized:Bool()
-    Return _realTime.isInitialized()
-  End Method
-
-  Method connect:Void( appKey:String, authToken:String = "DUMMY" )
-    _realTime.connect( appKey, authToken )
-  End Method
-
-  Method disconnect:Void()
-    _realTime.disconnect()
-  End Method
-
-  Method getAnnouncementSubChannel:String()
-    Return _realTime.getAnnouncementSubChannel()
-  End Method
-
-  Method getClusterUrl:String()
-    Return _realTime.getClusterUrl()
-  End Method
-  
-  Method getConnectionMetadata:String()
-    Return _realTime.getConnectionMetadata()
-  End Method
-  
-  Method getConnectionTimeout:Int()
-    Return _realTime.getConnectionTimeout()
-  End Method
-  
-  Method getHeartbeatActive:Bool()
-    Return _realTime.getHeartbeatActive()
-  End Method
-  
-  Method getHeartbeatFails:Int()
-    Return _realTime.getHeartbeatFails()
-  End Method
-  
-  Method getHeartbeatTime:Int()
-    Return _realTime.getHeartbeatTime()
-  End Method
-  
-  Method getId:Int()
-    Return _realTime.getId()
-  End Method
-  
-  Method getUrl:String()
-    Return _realTime.getUrl()
-  End Method
-  
-  Method isConnected:Bool()
-    Return _realTime.getIsConnected()
-  End Method
-  
-  Method isSubscribed:Bool( channelName:String )
-    Return _realTime.isSubscribed( channelName )
-  End Method
-  
-  Method send:Void( channelName:String, message:String )
-    _realTime.send( channelName, message )
-  End Method
-  
-  Method setAnnouncementSubChannel:Void( channelName:String )
-    _realTime.setAnnouncementSubChannel( channelName )
-  End Method
-  
-  Method setClusterUrl:Void( clusterUrl:String )
-    _realTime.setClusterUrl( clusterUrl )
-  End Method
-  
-  Method setConnectionMetadata:Void( connectionMetadata:String )
-    _realTime.setConnectionMetadata( connectionMetadata )
-  End Method
-  
-  Method setConnectionTimeout:Void( connectionTimeout:Int )
-    _realTime.setConnectionTimeout( connectionTimeout )
-  End Method
-  
-  Method setHeartbeatActive:Void( active:Bool )
-    _realTime.setHeartbeatActive( active )
-  End Method
-  
-  Method setHeartbeatFails:Void( newHeartbeatFails:Int )
-    _realTime.setHeartbeatFails( newHeartbeatFails )
-  End Method
-  
-  Method setHeartbeatTime:Void( newHeartbeatTime:Int )
-    _realTime.setHeartbeatTime( newHeartbeatTime )
-  End Method
-  
-  Method setId:Void( id:Int )
-    _realTime.setId( id )
-  End Method
-  
-  Method setUrl:Void( url:String )
-    _realTime.setUrl( url )
-  End Method
-  
-  Method subscribe:Void( channelName:String, subscribeOnReconnected:Bool = True )
-    _realTime.subscribe( channelName, subscribeOnReconnected )
-  End Method
-  
-  Method unsubscribe:Void( channelName:String )
-    _realTime.unsubscribe( channelName )
-  End Method
-
-Private
-  Method UpdateAsyncEvents:Void()
-    If( Not _realTime ) Then Return
-    Local numberOfEvents:Int = _realTime.getNumberOfEvents()
-    If( numberOfEvents = 0 ) Then Return
+#If( TARGET = "glfw" )
+  Class Realtime Implements IAsyncEventSource
+  Protected
+    Field _callback:IRealtimeCallback
     
-    'Fetch all events!
-    Local lastResult:Int = _realTime.getLastResult()
+  Private
+    'Prohibit usage of default constructor
+    Method New()
+    End Method
     
-    Select lastResult
-      Case RT_CLIENT_CONNECTED
-        _realTime.fetchLastEvent()  'Remove event from list of events
-        _callback.OnRealtimeConnected()
-      Case RT_CLIENT_DISCONNECTED
-        _realTime.fetchLastEvent()  'Remove event from list of events
-        _callback.OnRealtimeDisconnected()
-      Case RT_CLIENT_SUBSCRIBED
-        Local channelName:String = _realTime.getLastChannelName()
-        _realTime.fetchLastEvent()  'Remove event from list of events
-        _callback.OnRealtimeSubscribed( channelName )
-      Case RT_CLIENT_UNSUBSCRIBED
-        Local channelName:String = _realTime.getLastChannelName()
-        _realTime.fetchLastEvent()  'Remove event from list of events
-        _callback.OnRealtimeUnsubscribed( channelName )
-      Case RT_CLIENT_EXCEPTION
-        Local exception:String = _realTime.getLastError()
-        _realTime.fetchLastEvent()  'Remove event from list of events
-        _callback.OnRealtimeException( exception )
-      Case RT_CLIENT_RECONNECTING
-        _realTime.fetchLastEvent()  'Remove event from list of events
-        _callback.OnRealtimeReconnecting()
-      Case RT_CLIENT_RECONNECTED
-        _realTime.fetchLastEvent()  'Remove event from list of events
-        _callback.OnRealtimeReconnected()
-      Case RT_CLIENT_MESSAGE
-        Local channelName:String = _realTime.getLastChannelName()
-        Local message:String = _realTime.getLastMessage()
-        _realTime.fetchLastEvent()  'Remove event from list of events
-        'Check if we have a message from an announcement channel
-        Select( channelName )
-          Case "ortcClientConnected"
-            Local pos:Int = message.Find( ":" )
-            If( pos > 0 )
-              'get the metadata
-              Local metadata:String = message[..message.Length()-2]
-              metadata = metadata[pos+2..]
-              _callback.OnRealtimeClientConnected( metadata )
-            End If
-          Case "ortcClientDisconnected"
-            Local pos:Int = message.Find( ":" )
-            If( pos > 0 )
-              'get the metadata
-              Local metadata:String = message[..message.Length()-8]
-              metadata = metadata[pos+2..]
-              Local reason:String = message[message.Length()-2..]
-              reason = reason[..1]
-              _callback.OnRealtimeClientDisconnected( metadata, Int( reason ) )
-            End If
-          Case "ortcClientSubscribed"
-            Local str:String[] = message.Split( ":" )
-            Print str.Length()
-            If( str.Length() = 3 )
-              'Check for the channelName. If it's "ortcClientSubscribed" we ignore it because it's the announcement channel
-              Local channel:String = str[2]
-              channel = channel[..channel.Length()-2]
-              channel = channel[1..]
-              If( channel <> "ortcClientConnected" And channel <> "ortcClientDisconnected" And channel <> "ortcClientSubscribed" And channel <> "ortcClientUnsubscribed" )
-                Local metadata:String = str[1]
-                metadata = metadata[..metadata.Length()-6]
-                metadata = metadata[1..]
-                _callback.OnRealtimeClientSubscribed( metadata, channel )
+    Public
+    Method New( callback:IRealtimeCallback )
+      '    _realTime.init()
+      _callback = callback
+    End Method
+    
+    Method init:Void( appKey:String, authToken:String = "DUMMY" )
+      RTinit( appKey, authToken )
+      AddAsyncEventSource( Self )
+    End Method
+      
+    Method isInitialized:Bool()
+      Return RTisInitialized()
+    End Method
+    
+    Method connect:Void( appKey:String, authToken:String = "DUMMY" )
+      RTconnect( appKey, authToken )
+    End Method
+    
+    Method disconnect:Void()
+      RTdisconnect()
+    End Method
+    
+    Method getAnnouncementSubChannel:String()
+      Return RTgetAnnouncementSubChannel()
+    End Method
+    
+    Method getClusterUrl:String()
+      Return RTgetClusterUrl()
+    End Method
+      
+    Method getConnectionMetadata:String()
+      Return RTgetConnectionMetadata()
+    End Method
+      
+    Method getConnectionTimeout:Int()
+      Return RTgetConnectionTimeout()
+    End Method
+      
+    Method getHeartbeatActive:Bool()
+      Return RTgetHeartbeatActive()
+    End Method
+      
+    Method getHeartbeatFails:Int()
+      Return RTgetHeartbeatFails()
+    End Method
+      
+    Method getHeartbeatTime:Int()
+      Return RTgetHeartbeatTime()
+    End Method
+      
+    Method getId:Int()
+      Return RTgetId()
+    End Method
+      
+    Method getUrl:String()
+      Return RTgetUrl()
+    End Method
+      
+    Method isConnected:Bool()
+      Return RTgetIsConnected()
+    End Method
+      
+    Method isSubscribed:Bool( channelName:String )
+      Return RTisSubscribed( channelName )
+    End Method
+      
+    Method send:Void( channelName:String, message:String )
+      RTsend( channelName, message )
+    End Method
+      
+    Method setAnnouncementSubChannel:Void( channelName:String )
+      RTsetAnnouncementSubChannel( channelName )
+    End Method
+      
+    Method setClusterUrl:Void( clusterUrl:String )
+      RTsetClusterUrl( clusterUrl )
+    End Method
+      
+    Method setConnectionMetadata:Void( connectionMetadata:String )
+      RTsetConnectionMetadata( connectionMetadata )
+    End Method
+      
+    Method setConnectionTimeout:Void( connectionTimeout:Int )
+      RTsetConnectionTimeout( connectionTimeout )
+    End Method
+      
+    Method setHeartbeatActive:Void( active:Bool )
+      RTsetHeartbeatActive( active )
+    End Method
+      
+    Method setHeartbeatFails:Void( newHeartbeatFails:Int )
+      RTsetHeartbeatFails( newHeartbeatFails )
+    End Method
+      
+    Method setHeartbeatTime:Void( newHeartbeatTime:Int )
+      RTsetHeartbeatTime( newHeartbeatTime )
+    End Method
+      
+    Method setId:Void( id:Int )
+      RTsetId( id )
+    End Method
+      
+    Method setUrl:Void( url:String )
+      RTsetUrl( url )
+    End Method
+      
+    Method subscribe:Void( channelName:String, subscribeOnReconnected:Bool = True )
+      RTsubscribe( channelName, subscribeOnReconnected )
+    End Method
+      
+    Method unsubscribe:Void( channelName:String )
+      RTunsubscribe( channelName )
+    End Method
+    
+  Private
+    Method UpdateAsyncEvents:Void()
+      'If( Not _realTime ) Then Return
+      Local numberOfEvents:Int = RTgetNumberOfEvents()
+      If( numberOfEvents = 0 ) Then Return
+        
+      'Fetch all events!
+      Local lastResult:Int = RTgetLastResult()
+        
+      Select lastResult
+        Case RT_CLIENT_CONNECTED
+          RTfetchLastEvent()  'Remove event from list of events
+          _callback.OnRealtimeConnected()
+        Case RT_CLIENT_DISCONNECTED
+          RTfetchLastEvent()  'Remove event from list of events
+          _callback.OnRealtimeDisconnected()
+        Case RT_CLIENT_SUBSCRIBED
+          Local channelName:String = RTgetLastChannelName()
+          RTfetchLastEvent()  'Remove event from list of events
+          _callback.OnRealtimeSubscribed( channelName )
+        Case RT_CLIENT_UNSUBSCRIBED
+          Local channelName:String = RTgetLastChannelName()
+          RTfetchLastEvent()  'Remove event from list of events
+          _callback.OnRealtimeUnsubscribed( channelName )
+        Case RT_CLIENT_EXCEPTION
+          Local exception:String = RTgetLastError()
+          RTfetchLastEvent()  'Remove event from list of events
+          _callback.OnRealtimeException( exception )
+        Case RT_CLIENT_RECONNECTING
+          RTfetchLastEvent()  'Remove event from list of events
+          _callback.OnRealtimeReconnecting()
+        Case RT_CLIENT_RECONNECTED
+          RTfetchLastEvent()  'Remove event from list of events
+          _callback.OnRealtimeReconnected()
+        Case RT_CLIENT_MESSAGE
+          Local channelName:String = RTgetLastChannelName()
+          Local message:String = RTgetLastMessage()
+          RTfetchLastEvent()  'Remove event from list of events
+          'Check if we have a message from an announcement channel
+          Select( channelName )
+            Case "ortcClientConnected"
+              Local pos:Int = message.Find( ":" )
+              If( pos > 0 )
+                'get the metadata
+                Local metadata:String = message[..message.Length()-2]
+                metadata = metadata[pos+2..]
+                _callback.OnRealtimeClientConnected( metadata )
               End If
-            End If
-          Case "ortcClientUnsubscribed"
-            Local str:String[] = message.Split( ":" )
-            Print str.Length()
-            If( str.Length() = 3 )
-              'Check for the channelName. If it's "ortcClientUnsubscribed" we ignore it because it's the announcement channel
-              Local channel:String = str[2]
-              channel = channel[..channel.Length()-2]
-              channel = channel[1..]
-              If( channel <> "ortcClientConnected" And channel <> "ortcClientDisconnected" And channel <> "ortcClientSubscribed" And channel <> "ortcClientUnsubscribed" )
-                Local metadata:String = str[1]
-                metadata = metadata[..metadata.Length()-6]
-                metadata = metadata[1..]
-                _callback.OnRealtimeClientUnsubscribed( metadata, channel )
+            Case "ortcClientDisconnected"
+              Local pos:Int = message.Find( ":" )
+              If( pos > 0 )
+                'get the metadata
+                Local metadata:String = message[..message.Length()-8]
+                metadata = metadata[pos+2..]
+                Local reason:String = message[message.Length()-2..]
+                reason = reason[..1]
+                _callback.OnRealtimeClientDisconnected( metadata, Int( reason ) )
               End If
-            End If
-          Default
-            'No announcement channel, just proceed normally
-            _callback.OnRealtimeNewMessage( channelName, message )
-        End Select
-    End Select
-  End Method
-End Class
+            Case "ortcClientSubscribed"
+              Local str:String[] = message.Split( ":" )
+              'Print str.Length()
+              If( str.Length() = 3 )
+                'Check for the channelName. If it's "ortcClientSubscribed" we ignore it because it's the announcement channel
+                Local channel:String = str[2]
+                channel = channel[..channel.Length()-2]
+                channel = channel[1..]
+                If( channel <> "ortcClientConnected" And channel <> "ortcClientDisconnected" And channel <> "ortcClientSubscribed" And channel <> "ortcClientUnsubscribed" )
+                  Local metadata:String = str[1]
+                  metadata = metadata[..metadata.Length()-6]
+                  metadata = metadata[1..]
+                  _callback.OnRealtimeClientSubscribed( metadata, channel )
+                End If
+              End If
+            Case "ortcClientUnsubscribed"
+              Local str:String[] = message.Split( ":" )
+              'Print str.Length()
+              If( str.Length() = 3 )
+                'Check for the channelName. If it's "ortcClientUnsubscribed" we ignore it because it's the announcement channel
+                Local channel:String = str[2]
+                channel = channel[..channel.Length()-2]
+                channel = channel[1..]
+                If( channel <> "ortcClientConnected" And channel <> "ortcClientDisconnected" And channel <> "ortcClientSubscribed" And channel <> "ortcClientUnsubscribed" )
+                  Local metadata:String = str[1]
+                  metadata = metadata[..metadata.Length()-6]
+                  metadata = metadata[1..]
+                  _callback.OnRealtimeClientUnsubscribed( metadata, channel )
+                End If
+              End If
+            Default
+              'No announcement channel, just proceed normally
+              _callback.OnRealtimeNewMessage( channelName, message )
+          End Select
+      End Select
+    End Method
+  End Class
+#Else
+  Class Realtime Implements IAsyncEventSource
+  Protected
+    Field _realTime:XRealtime = Null
+    Field _callback:IRealtimeCallback
+  
+  Private
+    'Prohibit usage of default constructor
+    Method New()
+    End Method
+  
+  Public
+    Method New( callback:IRealtimeCallback )
+      _realTime = New XRealtime()
+  '    _realTime.init()
+      _callback = callback
+    End Method
+  
+    Method init:Void( appKey:String, authToken:String = "DUMMY" )
+      _realTime.init( appKey, authToken )
+      AddAsyncEventSource( Self )
+    End Method
+    
+    Method isInitialized:Bool()
+      Return _realTime.isInitialized()
+    End Method
+  
+    Method connect:Void( appKey:String, authToken:String = "DUMMY" )
+      _realTime.connect( appKey, authToken )
+    End Method
+  
+    Method disconnect:Void()
+      _realTime.disconnect()
+    End Method
+  
+    Method getAnnouncementSubChannel:String()
+      Return _realTime.getAnnouncementSubChannel()
+    End Method
+  
+    Method getClusterUrl:String()
+      Return _realTime.getClusterUrl()
+    End Method
+    
+    Method getConnectionMetadata:String()
+      Return _realTime.getConnectionMetadata()
+    End Method
+    
+    Method getConnectionTimeout:Int()
+      Return _realTime.getConnectionTimeout()
+    End Method
+    
+    Method getHeartbeatActive:Bool()
+      Return _realTime.getHeartbeatActive()
+    End Method
+    
+    Method getHeartbeatFails:Int()
+      Return _realTime.getHeartbeatFails()
+    End Method
+    
+    Method getHeartbeatTime:Int()
+      Return _realTime.getHeartbeatTime()
+    End Method
+    
+    Method getId:Int()
+      Return _realTime.getId()
+    End Method
+    
+    Method getUrl:String()
+      Return _realTime.getUrl()
+    End Method
+    
+    Method isConnected:Bool()
+      Return _realTime.getIsConnected()
+    End Method
+    
+    Method isSubscribed:Bool( channelName:String )
+      Return _realTime.isSubscribed( channelName )
+    End Method
+    
+    Method send:Void( channelName:String, message:String )
+      _realTime.send( channelName, message )
+    End Method
+    
+    Method setAnnouncementSubChannel:Void( channelName:String )
+      _realTime.setAnnouncementSubChannel( channelName )
+    End Method
+    
+    Method setClusterUrl:Void( clusterUrl:String )
+      _realTime.setClusterUrl( clusterUrl )
+    End Method
+    
+    Method setConnectionMetadata:Void( connectionMetadata:String )
+      _realTime.setConnectionMetadata( connectionMetadata )
+    End Method
+    
+    Method setConnectionTimeout:Void( connectionTimeout:Int )
+      _realTime.setConnectionTimeout( connectionTimeout )
+    End Method
+    
+    Method setHeartbeatActive:Void( active:Bool )
+      _realTime.setHeartbeatActive( active )
+    End Method
+    
+    Method setHeartbeatFails:Void( newHeartbeatFails:Int )
+      _realTime.setHeartbeatFails( newHeartbeatFails )
+    End Method
+    
+    Method setHeartbeatTime:Void( newHeartbeatTime:Int )
+      _realTime.setHeartbeatTime( newHeartbeatTime )
+    End Method
+    
+    Method setId:Void( id:Int )
+      _realTime.setId( id )
+    End Method
+    
+    Method setUrl:Void( url:String )
+      _realTime.setUrl( url )
+    End Method
+    
+    Method subscribe:Void( channelName:String, subscribeOnReconnected:Bool = True )
+      _realTime.subscribe( channelName, subscribeOnReconnected )
+    End Method
+    
+    Method unsubscribe:Void( channelName:String )
+      _realTime.unsubscribe( channelName )
+    End Method
+  
+  Private
+    Method UpdateAsyncEvents:Void()
+      If( Not _realTime ) Then Return
+      Local numberOfEvents:Int = _realTime.getNumberOfEvents()
+      If( numberOfEvents = 0 ) Then Return
+      
+      'Fetch all events!
+      Local lastResult:Int = _realTime.getLastResult()
+      
+      Select lastResult
+        Case RT_CLIENT_CONNECTED
+          _realTime.fetchLastEvent()  'Remove event from list of events
+          _callback.OnRealtimeConnected()
+        Case RT_CLIENT_DISCONNECTED
+          _realTime.fetchLastEvent()  'Remove event from list of events
+          _callback.OnRealtimeDisconnected()
+        Case RT_CLIENT_SUBSCRIBED
+          Local channelName:String = _realTime.getLastChannelName()
+          _realTime.fetchLastEvent()  'Remove event from list of events
+          _callback.OnRealtimeSubscribed( channelName )
+        Case RT_CLIENT_UNSUBSCRIBED
+          Local channelName:String = _realTime.getLastChannelName()
+          _realTime.fetchLastEvent()  'Remove event from list of events
+          _callback.OnRealtimeUnsubscribed( channelName )
+        Case RT_CLIENT_EXCEPTION
+          Local exception:String = _realTime.getLastError()
+          _realTime.fetchLastEvent()  'Remove event from list of events
+          _callback.OnRealtimeException( exception )
+        Case RT_CLIENT_RECONNECTING
+          _realTime.fetchLastEvent()  'Remove event from list of events
+          _callback.OnRealtimeReconnecting()
+        Case RT_CLIENT_RECONNECTED
+          _realTime.fetchLastEvent()  'Remove event from list of events
+          _callback.OnRealtimeReconnected()
+        Case RT_CLIENT_MESSAGE
+          Local channelName:String = _realTime.getLastChannelName()
+          Local message:String = _realTime.getLastMessage()
+          _realTime.fetchLastEvent()  'Remove event from list of events
+          'Check if we have a message from an announcement channel
+          Select( channelName )
+            Case "ortcClientConnected"
+              Local pos:Int = message.Find( ":" )
+              If( pos > 0 )
+                'get the metadata
+                Local metadata:String = message[..message.Length()-2]
+                metadata = metadata[pos+2..]
+                _callback.OnRealtimeClientConnected( metadata )
+              End If
+            Case "ortcClientDisconnected"
+              Local pos:Int = message.Find( ":" )
+              If( pos > 0 )
+                'get the metadata
+                Local metadata:String = message[..message.Length()-8]
+                metadata = metadata[pos+2..]
+                Local reason:String = message[message.Length()-2..]
+                reason = reason[..1]
+                _callback.OnRealtimeClientDisconnected( metadata, Int( reason ) )
+              End If
+            Case "ortcClientSubscribed"
+              Local str:String[] = message.Split( ":" )
+              'Print str.Length()
+              If( str.Length() = 3 )
+                'Check for the channelName. If it's "ortcClientSubscribed" we ignore it because it's the announcement channel
+                Local channel:String = str[2]
+                channel = channel[..channel.Length()-2]
+                channel = channel[1..]
+                If( channel <> "ortcClientConnected" And channel <> "ortcClientDisconnected" And channel <> "ortcClientSubscribed" And channel <> "ortcClientUnsubscribed" )
+                  Local metadata:String = str[1]
+                  metadata = metadata[..metadata.Length()-6]
+                  metadata = metadata[1..]
+                  _callback.OnRealtimeClientSubscribed( metadata, channel )
+                End If
+              End If
+            Case "ortcClientUnsubscribed"
+              Local str:String[] = message.Split( ":" )
+              'Print str.Length()
+              If( str.Length() = 3 )
+                'Check for the channelName. If it's "ortcClientUnsubscribed" we ignore it because it's the announcement channel
+                Local channel:String = str[2]
+                channel = channel[..channel.Length()-2]
+                channel = channel[1..]
+                If( channel <> "ortcClientConnected" And channel <> "ortcClientDisconnected" And channel <> "ortcClientSubscribed" And channel <> "ortcClientUnsubscribed" )
+                  Local metadata:String = str[1]
+                  metadata = metadata[..metadata.Length()-6]
+                  metadata = metadata[1..]
+                  _callback.OnRealtimeClientUnsubscribed( metadata, channel )
+                End If
+              End If
+            Default
+              'No announcement channel, just proceed normally
+              _callback.OnRealtimeNewMessage( channelName, message )
+          End Select
+      End Select
+    End Method
+  End Class
+#End If
