@@ -32,7 +32,7 @@ XRealtime.prototype.init = function( appKey, appToken )
   var head = document.getElementsByTagName( 'head' )[0];
   var script = document.createElement( 'script' );
   script.type = 'text/javascript';
-  script.src = "http://messaging-public.realtime.co/js/2.1.0/ortc.js";
+  script.src = "//messaging-public.realtime.co/js/2.1.0/ortc.js";
   head.appendChild( script );
   _isInitialized = false;
 
@@ -53,7 +53,7 @@ XRealtime.prototype.init = function( appKey, appToken )
 
           // Set ORTC client properties
           _ortcClient.setConnectionMetadata( 'clientConnMeta' );
-          _ortcClient.setClusterUrl( 'http://ortc-developers.realtime.co/server/2.1/' );
+          _ortcClient.setClusterUrl( 'https://ortc-developers.realtime.co/server/2.1/' );
 
           _ortcClient.onConnected = function( ortc )
           {
